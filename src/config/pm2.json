@@ -1,0 +1,11 @@
+{
+  "apps": [
+    {
+      "name": "server",
+      "exec_mode": "cluster",
+      "instances": "max",
+      "script": "./dist/server.js",
+      "interpreter": "ts-node"
+    } 
+  ]
+}

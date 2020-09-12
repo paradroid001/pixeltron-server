@@ -1,3 +1,6 @@
+#the output dir for building this module
+/lib
+
 # Logs
 logs
 *.log
