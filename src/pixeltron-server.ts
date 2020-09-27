@@ -13,17 +13,39 @@ import middleware from './middleware';
 import errorHandlers from './middleware/errorHandlers';
 import routes from './services';
 import * as path from 'path';
-import { MonitorServer } from './services/dashboard/MonitorServer';
-//import {RuinsServer} from "./ruins/RuinsServer";
-import { GameServer } from './services/core/GameServer';
-import { DataService } from './services/data/DataService';
-const ds: DataService = new DataService();
 // ds.createAccount("test1", "password", "test1@test.com", false);
 
 //ds.login("test1", "fdsd"); // should fail
 //ds.login("test1", "password"); // should succeed
 
 // ds.logout("test1"); No logout on ds...
+
+export { Action } from './services/core/Action';
+export { ActionMove } from './services/core/ActionMove';
+export { ActionStatus } from './services/core/ActionStatus';
+export { ActionStore } from './services/core/ActionStore';
+export { Vector2, randomChoice, randomInt } from './services/core/Base';
+export { GameServer } from './services/core/GameServer';
+export { Message, Messaging } from './services/core/Message';
+export { sync, SyncAccess, NetEntity } from './services/core/NetEntity';
+export { NetEntityStore } from './services/core/NetEntityStore';
+export { NetObject } from './services/core/NetObject';
+export { NetPlayer } from './services/core/NetPlayer';
+export { PlayerConnection, PlayerConnections } from './services/core/PlayerConnection';
+export { GameServerEvent, GameServerEventField, GameClientEvent } from './services/core/Protocol';
+export { GameServerStats } from './services/dashboard/GameServerStats';
+export { MonitorServer } from './services/dashboard/MonitorServer';
+export { DataService } from "./services/data/DataService";
+export { PlayerAccount } from "./services/data/entities/PlayerAccount";
+//export * from "./utils/Logging";
+//export logger; 
+
+
+import { MonitorServer } from './services/dashboard/MonitorServer';
+import { GameServer } from './services/core/GameServer';
+import { DataService } from './services/data/DataService';
+const ds: DataService = new DataService();
+
 
 // Error Handling
 process.on('uncaughtException', (e) => {
@@ -43,20 +65,25 @@ export class PixeltronServer {
     public monitorhttp;
     public monitorServer;
 
-    constructor() {
+    constructor(gamepaths: any, monitorpaths:any ) 
+    {
         this.gamerouter = express();
-        this.gamerouter.use('/game', express.static(path.join(__dirname, 'public', 'game')));
-        this.gamerouter.use('/public', express.static(path.join(__dirname, 'public')));
-        this.gamerouter.use('/tests', express.static(path.join(__dirname, 'tests')));
-        this.gamerouter.use('/tests/coverage/', express.static(path.join(__dirname, 'tests', 'lcov-report')));
+        for (let key in gamepaths)
+        {
+            this.gamerouter.use(key, express.static(gamepaths[key]));
+        }
+        //this.gamerouter.use('/game', express.static(path.join(__dirname, 'public', 'game')));
+        //this.gamerouter.use('/public', express.static(path.join(__dirname, 'public')));
+        //this.gamerouter.use('/tests', express.static(path.join(__dirname, 'tests')));
+        //this.gamerouter.use('/tests/coverage/', express.static(path.join(__dirname, 'tests', 'lcov-report')));
         applyMiddleware(middleware, this.gamerouter);
         applyRoutes(routes, this.gamerouter);
         applyMiddleware(errorHandlers, this.gamerouter);
 
         this.monitorrouter = express();
-        this.monitorrouter.set('views', path.join(__dirname, 'public'));
+        this.monitorrouter.set('views', monitorpaths['views']);
         this.monitorrouter.set('view engine', 'ejs');
-        this.monitorrouter.use('/js', express.static(path.join(__dirname, 'public', 'js')));
+        this.monitorrouter.use('/js', express.static(monitorpaths['/js']) );
         this.monitorrouter.get('/', (req, res) => {
             // render server template
             res.render('status');
@@ -129,23 +156,5 @@ monitorhttp.listen( MONITORPORT, () =>
 });
 
 */
-export { Action } from './services/core/Action';
-export { ActionMove } from './services/core/ActionMove';
-export { ActionStatus } from './services/core/ActionStatus';
-export { ActionStore } from './services/core/ActionStore';
-export { Vector2, randomChoice, randomInt } from './services/core/Base';
-export { GameServer } from './services/core/GameServer';
-export { Message, Messaging } from './services/core/Message';
-export { sync, SyncAccess, NetEntity } from './services/core/NetEntity';
-export { NetEntityStore } from './services/core/NetEntityStore';
-export { NetObject } from './services/core/NetObject';
-export { NetPlayer } from './services/core/NetPlayer';
-export { PlayerConnection, PlayerConnections } from './services/core/PlayerConnection';
-export { GameServerEvent, GameServerEventField, GameClientEvent } from './services/core/Protocol';
-export { GameServerStats } from './services/dashboard/GameServerStats';
-export { MonitorServer } from './services/dashboard/MonitorServer';
-export { DataService } from "./services/data/DataService";
-export { PlayerAccount } from "./services/data/entities/PlayerAccount";
-//export * from "./utils/Logging";
-//export logger; 
+
 
