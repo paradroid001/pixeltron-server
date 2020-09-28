@@ -1,9 +1,11 @@
-import 'reflect-metadata';
-import dotenv from 'dotenv';
+import 'reflect-metadata'; //only for typeorm?
 
-dotenv.config({ path: './src/config/.env' }); // env vars
-const { PORT = 3000 } = process.env;
-const { MONITORPORT = 4000 } = process.env;
+//This stuff shouldn't be needed any more.
+//import dotenv from 'dotenv';
+//dotenv.config({ path: './src/config/.env' }); // env vars
+//const { PORT = 3000 } = process.env;
+//const { MONITORPORT = 4000 } = process.env;
+
 import logger from './utils/Logging';
 
 import http from 'http';
@@ -12,7 +14,8 @@ import { applyMiddleware, applyRoutes } from './utils';
 import middleware from './middleware';
 import errorHandlers from './middleware/errorHandlers';
 import routes from './services';
-import * as path from 'path';
+//import * as path from 'path'; //don't need this anymore?
+
 // ds.createAccount("test1", "password", "test1@test.com", false);
 
 //ds.login("test1", "fdsd"); // should fail
@@ -39,8 +42,8 @@ export { DataService } from "./services/data/DataService";
 export { PlayerAccount } from "./services/data/entities/PlayerAccount";
 //export * from "./utils/Logging";
 //export logger; 
-
-
+export { copyResources } from './utils/copyResources';
+export { ServerConfig } from './config/config';
 import { MonitorServer } from './services/dashboard/MonitorServer';
 import { GameServer } from './services/core/GameServer';
 import { DataService } from './services/data/DataService';

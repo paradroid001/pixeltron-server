@@ -13,6 +13,7 @@
     "lint": "eslint -c src/config/.eslintrc.js --ignore-path src/config/.eslintignore src --ext .ts --fix",
     "test": "jest --config src/config/jestconfig.json",
     "build": "tsc",
+    "dev": "tsc-watch",
     "prepare": "npm run build",
     "prepublishOnly": "npm test && npm run lint",
     "preversion": "npm run lint",
