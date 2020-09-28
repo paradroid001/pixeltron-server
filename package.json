@@ -13,6 +13,7 @@
     "format": "prettier --config src/config/.prettierrc.js --write \"src/**/*.ts\" \"src/**/*.js\"",
     "lint": "eslint -c src/config/.eslintrc.js --ignore-path src/config/.eslintignore src --ext .ts --fix",
     "test": "jest --config src/config/jestconfig.json",
+    "test-full": "jest --config src/config/jestconfig.json --coverage --verbose --coverageDirectory='../../lib/tests'",
     "prebuild": "npm run clean",
     "build": "tsc",
     "postbuild": "npm run doc",

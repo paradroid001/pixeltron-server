@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Server Monitor</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!--
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/icon?family=Material+Icons">
+    -->
+    <script src="js/jquery.min.js"></script>
+    <script src="js/jquery.sparkline.min.js"></script>
+    <script src="js/socket.io.min.js"></script>
+    <!--<script src="js/stats.js"></script>-->
+
+    <style type="text/css">
+        .contentpane {display:block; float:left; margin-left: 7px; width:40%;}
+        .canvaspane {
+                    display: block;
+                     
+                    /*float:left; */
+                     /*width:400px; 
+                     height:400px;*/ 
+                     border:1px solid black; 
+                     image-rendering: -moz-crisp-edges;         /* Firefox */
+                     image-rendering:   -o-crisp-edges;         /* Opera */
+                     image-rendering: -webkit-optimize-contrast;/* Webkit (non-standard naming) */
+                     image-rendering: crisp-edges;
+                    }
+        .login_header {display: block;}
+        .login_header_item:hover {text-decoration: underline;}
+        .players {
+                    z-index: 5;
+                    position: absolute;
+                    padding-top: 10px;
+                    padding-right: 10px;
+                    right: 0;
+                    text-align: right;
+                    font-size: 1.5em;
+        }
+        .playerlist {
+                    z-index: 5;
+                    position: absolute;
+                    padding-top: 30px;
+                    padding-right: 10px;
+                    right: 0;
+                    text-align: right;
+                    font-size: 1.5em;
+        }
+
+
+        .playername {
+                    text-align: center;
+                    box-shadow: rgb(0, 0, 0) 0px 6px 50px;
+                    opacity: 1;
+                    background: rgb(128, 128, 128);
+                    vertical-align: middle;
+                    width: 250px;
+                    font-family: 'Lucida Sans Unicode', 'Lucida Grande', sans-serif;
+                    }
+        </style>
+        <script>
+            var socket;
+            var updatePlayers = function( playerlist ){
+                console.log("players updated with " + playerlist);
+            }
+
+            var onDataRecieved = function ( data ){
+
+            }
+
+            var initApp = function ( )
+            {
+                var cpuUserHistory = [];
+                var cpuSystemHistory = [];
+                var cpuHistory = []
+
+                var memUsedHistory = []
+                var memAllocHistory = []
+                var memHistory = []
+
+                var playercountHistory = [];
+                var entitycountHistory = [];
+                //Operations
+                var operationsHistory = [];
+                var createsHistory = [];
+                var updatesHistory = [];
+                var destroysHistory = [];
+
+                //actions
+                var allactionsHistory = [];
+                var queuedActionsHistory = [];
+                var actionsHistory = [];
+
+                socket = io.connect(`http://127.0.0.1:3002`);    
+                //#This code runs when everything has been loaded on the page */
+                //# Inline sparklines take their values from the contents of the tag
+                
+                //#Sparklines can also take their values from the first argument 
+                //#passed to the sparkline() function
+                $('.serverload').sparkline( [1, 2, 3, 4], {
+                    type: "line",
+                    chartRangeMin: 0,
+                    chartRangeMax: 100,
+                    height: "100px",
+                    width: "500px",
+                    lineColor: "darkred",
+                    fillColor: "#FF9999",
+                    //composite: true
+                } );
+                $('.memoryload').sparkline( [1,2 , 3, 4], {
+                    height: "100px",
+                    width: "500px",
+                    chartRangeMin: 0,
+                    lineColor: "darkgreen",
+                    fillColor: "lightgreen",
+                    //composite: true
+                 } );
+
+                
+                $('.entities').sparkline( []);
+                $('.operations').sparkline( [] );
+                $('.actions').sparkline( [] );
+                
+                
+                //#The second argument gives options such as chart type */
+                //$('.dynamicbar').sparkline( [], {
+                //    type: 'bar',
+                //    barColor: 'green'
+                //});
+                //#Use 'html' instead of an array of values to pass options 
+                //#to a sparkline with data in the tag
+                //$('.inlinebar').sparkline('html', {
+                //    type: 'bar',
+                //    barColor: 'red'
+                //});
+                console.log("finished initing stats app");
+            
+                socket.on('connected', ( data ) => {
+                    console.log("connected to stats server");
+                });
+                socket.on('update', ( data ) => {
+                    console.log('data recieved: ' + JSON.stringify(data));
+                    //var playerlist = data.players;
+                    //var playercount = playerlist.length;
+                    //these might need to be push values.
+                    cpuUserHistory.push(data.cpu_user);
+                    cpuSystemHistory.push(data.cpu_system);
+                    cpuHistory.push(data.cpu_user + data.cpu_system);
+                    memAllocHistory.push(data.mem_alloc);
+                    memUsedHistory.push(data.mem_used);
+                    memHistory.push(data.mem_used + data.mem_alloc);
+
+                    
+                    
+                    //playercountHistory.push(playercount);
+                    //$('.dynamicsparkline').sparkline(playercount);
+
+                    $('.serverload').sparkline(cpuHistory, {
+                        //chartRangeMin: 0,
+                        //chartRangeMax: 100,
+                        height: "100px",
+                        width: "500px",
+                        lineColor: "darkred",
+                        fillColor: "#FF9999",
+                        //composite: true
+                    });
+
+                    
+                    $('.serverload').sparkline(cpuUserHistory, {
+                        lineColor: "red",
+                        fillColor: "#FFAA99",
+                        composite: true
+                    });
+
+                    $('.serverload').sparkline(cpuSystemHistory, {
+                        lineColor: "purple",
+                        fillColor: "#FFAAFF",
+                        composite: true
+                    });
+                    
+
+                    $('.memoryload').sparkline(memHistory, {
+                        //normalRangeMin: 0,
+                        //normalRangeMax: 100,
+                        height: "100px",
+                        width: "500px",
+                        chartRangeMin: 0,
+                        lineColor: "darkgreen",
+                        fillColor: "lightgreen",
+                        
+                    });
+                    
+                    $('.memoryload').sparkline(memAllocHistory, {
+                        lineColor: "green",
+                        fillColor: "FFFFAA",
+                        composite: true
+                    });
+                    $('.memoryload').sparkline(memUsedHistory, {
+                        lineColor: "yellow",
+                        fillColor: "FFFFCC",
+                        composite: true
+                    });
+
+                    playercountHistory.push(data.playerCount);
+                    entitycountHistory.push(data.entCount);
+                    $('.entities').sparkline(entitycountHistory, {
+                        height: "100px",
+                        width: "500px",
+                        chartRangeMin: 0,
+                        lineColor: "darkgreen",
+                        fillColor: "lightgreen",
+                    });
+                    $('.entities').sparkline(playercountHistory, {
+                        
+                        lineColor: "blue",
+                        fillColor: "lightblue",
+                        composite: true
+                    });
+
+                    createsHistory.push(data.creates);
+                    updatesHistory.push(data.updates);
+                    destroysHistory.push(data.destroys);
+                    operationsHistory.push(data.creates + data.updates + data.destroys);
+                    $('.operations').sparkline(operationsHistory, {
+                        height: "100px",
+                        width: "500px",
+                        chartRangeMin: 0,
+                        lineColor: "darkgreen",
+                        fillColor: "lightgreen",
+                    });
+                    $('.operations').sparkline(createsHistory, {
+                        lineColor: "blue",
+                        fillColor: "lightblue",
+                        composite: true
+                    });
+                    $('.operations').sparkline(updatesHistory, {
+                        lineColor: "red",
+                        fillColor: "lightred",
+                        composite: true
+                    });
+                    $('.operations').sparkline(destroysHistory, {
+                        lineColor: "yellow",
+                        fillColor: "yellow",
+                        composite: true
+                    });
+
+                    actionsHistory.push(data.actions);
+                    queuedActionsHistory.push(data.queuedActions);
+                    allactionsHistory.push(data.actions + data.queuedActions);
+                    $('.actions').sparkline(allactionsHistory, {
+                        height: "100px",
+                        width: "500px",
+                        chartRangeMin: 0,
+                        lineColor: "blue",
+                        fillColor: "lightblue",
+                    });
+                    $('.actions').sparkline(actionsHistory, {
+                        lineColor: "red",
+                        fillColor: "lightred",
+                        composite: true
+                    });
+                    $('.actions').sparkline(queuedActionsHistory, {
+                        lineColor: "green",
+                        fillColor: "lightgreen",
+                        composite: true
+                    });
+                    
+                    
+                });
+            }
+
+           $(document).ready(function(){
+            initApp();
+        });
+        </script> 
+</head>
+<body>
+        <script src="js/require.js"></script>
+        <span id="players" class="players"></span></br>
+        <span id="playerlist" class ="playerlist"></span></br>
+<p>
+<p>
+Server Load (CPU): <span class="serverload">Loading..</span>
+</p>
+<p>
+Server Load (MEM): <span class="memoryload">Loading..</span>
+</p>
+<p>
+Entities: <span class="entities">Loading..</span>
+</p>
+<p>
+Operations: <span class="operations">Loading..</span>
+<p>
+<p>
+Actions: <span class="actions">Loading..</span>
+<p>
+                
+
+        
+        <div id='canvasdiv' class="canvaspane">
+            <canvas id="canvas" style="border: 1px solid red;"></canvas>
+        </div>
+                
+    </body>
+</body>
+</html>

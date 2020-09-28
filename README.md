@@ -1,7 +1,142 @@
 # pixeltron-server
 socket io server in typescript
 
+# Deploying
 
+A project depending on pixeltron-server can then write code that extends pixeltron-server.GameServer
+src/config: overall config files
+src/config/dev and src/config/prod: supply a .env file and config.json file, something like:
+
+##.env:
+'''
+    #port for main server to run on
+    PORT=3001
+    MONITORPORT=3002
+    #how long before socket clients disconnect with no activity
+    WS_TIMEOUT=5000
+    #how often do clients ping the server
+    WS_INTERVAL=2000
+
+    #server tick rate of one second
+    SERVERTICKRATE = 250
+
+    OPEN_CAGE_DATA_KEY=8c0892514e884f09af7c09a9b067b02b
+    PATH_PM_MONITOR=./node_modules/pm2-server-monitor/webUI/
+
+    # *** Which mode is NODE_ENV running in? ***
+    #NODE_ENV=production
+    NODE_ENV=development
+
+    # *** Debugging socket *** #
+    #DEBUG=socket.io*
+'''
+
+##config.json:
+'''
+{
+    "gamepaths": {
+        "/game": ["public", "game"],
+        "/public": ["public"],
+        "/tests": ["tests"],
+        "/tests/coverage/": ["tests", "lcov-report"]
+    },
+    "monitorpaths": {
+        "views": ["public"],
+        "/js": ["public", "js"]
+    },
+    "resources": [
+        ["src/res", "dist/public"],
+        ["client/dist/webgl", "dist/public/game"]
+    ]
+}
+'''
+
+Your server.ts file can then look something like this:
+
+##server.ts:
+'''
+import * as path from "path";
+import { PixeltronServer } from 'pixeltron-server';
+import { ServerConfig } from 'pixeltron-server';
+import { copyResources } from 'pixeltron-server';
+import yargs from "yargs";
+
+//Copy our config dir
+copyResources([["src/config/dev/", "dist/config/"]]);
+let sconfig = ServerConfig(path.join(__dirname, 'config', '.env'), path.join(__dirname, 'config', 'config.json') );
+if (sconfig.ENV.NODE_ENV == 'development')
+{
+  console.log("DEVELOPMENT MODE: CONFIG");
+  console.log(sconfig);
+}
+
+import {RuinsServer} from "./ruins/RuinsServer";
+
+let gamepaths = {};
+for (let gamepath in sconfig.gamepaths)
+{
+  gamepaths[gamepath] = path.join(__dirname, ...sconfig.gamepaths[gamepath] );
+}
+
+let monitorpaths = {};
+for (let monitorpath in sconfig.monitorpaths)
+{
+  monitorpaths[monitorpath] = path.join(__dirname, ...sconfig.monitorpaths[monitorpath] );
+}
+
+const argv = yargs.options(
+  {
+    env: 
+    {
+      alias: 'e',
+      choices: ['dev', 'prod'] as const,
+      demandOption: true,
+      description: "app environment (prod or dev)"
+    },
+    stage:
+    {
+      alias: 's',
+      type: 'boolean',
+      default: false,
+      description: 'stage assets before running'
+    }
+  }
+).argv;
+//console.log(argv);
+
+if (argv.stage == true)
+{
+  console.log("SHould do staging setup");
+  copyResources(sconfig.resources);
+}
+
+if (argv.env == 'dev')
+{
+  console.log("Development setup here");
+}
+else if (argv.env == 'prod')
+{
+  console.log("Prod setup here");
+}
+
+
+let MakeServer = (router: any, httpserver: any, port: number|string) : RuinsServer =>
+{
+  return new RuinsServer(router, httpserver, port);
+}
+
+let p = new PixeltronServer(gamepaths, monitorpaths);
+p.start(sconfig.PORT, sconfig.MONITORPORT, MakeServer);
+
+
+'''
+
+You will also need a res directory for resources, with:
+res/js
+    -jquery, jquery sparkline, socket.io
+- a status.ejs file for the monitor server. See sample.status.ejs in the config dir.
+
+## Development
 Setting this up came from: https://itnext.io/production-ready-node-js-rest-apis-setup-using-typescript-postgresql-and-redis-a9525871407
 
 First of all, we're using tsc-watch as a dev tool (see package.json) - this means we can run 
