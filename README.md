@@ -8,7 +8,7 @@ src/config: overall config files
 src/config/dev and src/config/prod: supply a .env file and config.json file, something like:
 
 ##.env:
-'''
+```
     #port for main server to run on
     PORT=3001
     MONITORPORT=3002
@@ -20,7 +20,6 @@ src/config/dev and src/config/prod: supply a .env file and config.json file, som
     #server tick rate of one second
     SERVERTICKRATE = 250
 
-    OPEN_CAGE_DATA_KEY=8c0892514e884f09af7c09a9b067b02b
     PATH_PM_MONITOR=./node_modules/pm2-server-monitor/webUI/
 
     # *** Which mode is NODE_ENV running in? ***
@@ -29,10 +28,10 @@ src/config/dev and src/config/prod: supply a .env file and config.json file, som
 
     # *** Debugging socket *** #
     #DEBUG=socket.io*
-'''
+```
 
 ##config.json:
-'''
+```
 {
     "gamepaths": {
         "/game": ["public", "game"],
@@ -49,12 +48,12 @@ src/config/dev and src/config/prod: supply a .env file and config.json file, som
         ["client/dist/webgl", "dist/public/game"]
     ]
 }
-'''
+```
 
 Your server.ts file can then look something like this:
 
 ##server.ts:
-'''
+```
 import * as path from "path";
 import { PixeltronServer } from 'pixeltron-server';
 import { ServerConfig } from 'pixeltron-server';
@@ -129,7 +128,7 @@ let p = new PixeltronServer(gamepaths, monitorpaths);
 p.start(sconfig.PORT, sconfig.MONITORPORT, MakeServer);
 
 
-'''
+```
 
 You will also need a res directory for resources, with:
 res/js
