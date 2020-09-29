@@ -7,7 +7,7 @@ A project depending on pixeltron-server can then write code that extends pixeltr
 src/config: overall config files
 src/config/dev and src/config/prod: supply a .env file and config.json file, something like:
 
-##.env:
+### .env:
 ```
     #port for main server to run on
     PORT=3001
@@ -30,7 +30,7 @@ src/config/dev and src/config/prod: supply a .env file and config.json file, som
     #DEBUG=socket.io*
 ```
 
-##config.json:
+### config.json:
 ```
 {
     "gamepaths": {
@@ -52,7 +52,7 @@ src/config/dev and src/config/prod: supply a .env file and config.json file, som
 
 Your server.ts file can then look something like this:
 
-##server.ts:
+### server.ts:
 ```
 import * as path from "path";
 import { PixeltronServer } from 'pixeltron-server';
