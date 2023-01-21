@@ -57,7 +57,7 @@ export class NetEntity {
         this._dirtyprops = []; // clear dirty properties
     }
 
-    constructor() {
+    public constructor() {
         this._new = true;
         this._classtype = this.constructor.name; // default.
         // console.log(this._classtype);

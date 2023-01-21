@@ -1,0 +1,5 @@
+{
+    "$schema": "https://typedoc.org/schema.json",
+    "entryPoints": ["../pixeltron-server.ts"],
+    "out": "../../lib/doc"
+}

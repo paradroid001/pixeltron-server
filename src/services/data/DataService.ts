@@ -1,26 +1,22 @@
 import 'reflect-metadata';
-import {
-    createConnection,
-    getRepository,
-    getConnection,
-    Connection,
-    ConnectionOptions,
-    ConnectionOptionsReader,
-} from 'typeorm';
-import logger from '../../utils/Logging';
+import { DataSource } from 'typeorm';
 
+import logger from '../../utils/Logging';
 import { PlayerAccount } from './entities/PlayerAccount';
 
-export class DataService {
-    private connection: Connection;
+export class DataService
+{
+    private appDataSource: DataSource;
 
-    constructor() {
+    constructor()
+    {
         this.dbconn();
-        logger.debug(JSON.stringify(getConnection().options));
+        //logger.debug(JSON.stringify(getConnection().options));
     }
 
-    public dbconn(): Promise<Connection> {
-        return createConnection({
+    public dbconn(): void
+    {
+        this.appDataSource = new DataSource({
             type: 'sqlite',
             database: 'database.sqlite',
             synchronize: true, // sync entities every time we run
@@ -28,12 +24,15 @@ export class DataService {
             entities: [__dirname + '/entities/**/*.js'],
             migrations: [__dirname + '/migration/**/*.js'],
             subscribers: [__dirname + '/subscriber/**/*.js'],
-            cli: {
-                entitiesDir: __dirname + '/entities',
-                migrationsDir: __dirname + '/migration',
-                subscribersDir: __dirname + '/subscriber',
-            },
         });
+
+        this.appDataSource.initialize()
+        .then(async () => {
+            await console.log("Database initialised");
+        })
+        .catch(async(error) => {
+            await console.log(error);
+        })
     }
 
     public createAccount(name: string, password: string, emailAddress: string, admin = false) {
@@ -46,6 +45,7 @@ export class DataService {
         account.lastLoginTime = 0;
         account.lastLogoutTime = 0;
 
+        /* TODO how do I do this now?
         this.dbconn().then(async (connection) => {
             const ar = connection.getRepository(PlayerAccount);
             await ar.save(account);
@@ -53,10 +53,12 @@ export class DataService {
             const allaccounts = await ar.find();
             logger.debug('All accounts: ' + allaccounts);
         });
+        */
     }
 
     public login(username: string, password: string): boolean {
         let retval = false;
+        /* TODO how do I do this now?
         this.dbconn()
             .then(async (connection) => {
                 const ar = connection.getRepository(PlayerAccount);
@@ -65,6 +67,7 @@ export class DataService {
                 });
             })
             .catch((error) => console.log(error));
+        */
         return retval;
     }
 

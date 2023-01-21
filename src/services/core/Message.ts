@@ -1,3 +1,4 @@
+import * as SocketIO from 'socket.io';
 import { NetPlayer } from './NetPlayer';
 import { PlayerConnections, PlayerConnection } from './PlayerConnection';
 import { GameServerEvent } from './Protocol';

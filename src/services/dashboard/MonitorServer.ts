@@ -1,6 +1,8 @@
 // require('dotenv').config( { path: "./src/config/.env" }); // env vars
 // import * as socketIO from "socket.io";
 import * as express from 'express';
+import * as SocketIO from 'socket.io';
+
 import { Server } from 'http';
 // const logger = require("../../utils/Logging");
 import logger from '../../utils/Logging';

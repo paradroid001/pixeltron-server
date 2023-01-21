@@ -10,7 +10,7 @@ export class NetObject extends NetEntity {
     @sync('name')
     public name: string;
 
-    constructor() {
+    public constructor() {
         super();
         this._position = new Vector2();
     }

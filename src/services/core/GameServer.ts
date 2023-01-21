@@ -1,7 +1,8 @@
 // const logger = require("../../utils/Logging");
 import logger from '../../utils/Logging';
-import * as socketIO from 'socket.io';
+import * as SocketIO from 'socket.io';
 import * as express from 'express';
+
 import { Server } from 'http';
 
 import { NetEntityStore } from './NetEntityStore';
@@ -76,13 +77,22 @@ export class GameServer {
         this.io = require('socket.io')(server, {
             pingInterval: process.env.WS_INTERVAL,
             pingTimeout: process.env.WS_TIMEOUT,
+            //cors: {
+            //    origin: 'http://127.0.0.1:3002',
+            //    methods: ["GET", "POST"],
+            //    transports: ['websocket', 'polling'],
+            //    credentials: false
+            //},
+            allowEIO3: true
         });
 
+        let thisobj = this;
+
         this.io.on(GameClientEvent.SOCKETCONNECT, (socket: any) => {
-            logger.info('User connected on port ' + this.port);
+            logger.info('User connected on port ' + thisobj.port);
             // Set up auth response handler
             socket.on(GameClientEvent.AUTHRESPONSE, (data: any) => {
-                this.authenticate(socket, data);
+                thisobj.authenticate(socket, data);
             });
             // Ask the client to auth
             socket.emit(GameServerEvent.AUTHREQUEST, '');

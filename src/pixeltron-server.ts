@@ -63,7 +63,7 @@ process.on('unhandledRejection', (e) => {
 export class PixeltronServer {
     public gamerouter;
     public gamehttp;
-    public gameServer;
+    public gameServer: GameServer;
     public monitorrouter;
     public monitorhttp;
     public monitorServer;
@@ -93,19 +93,19 @@ export class PixeltronServer {
         });
     }
 
-    public start(gport: string | number, mport: string | number, fn: (router: any, httpserver: any, port: number|string) => void)
+    public start(gaddr: string, gport: string | number, maddr: string, mport: string | number, fn: (router: any, httpserver: any, port: number|string) => GameServer)
     {
         this.gamehttp = http.createServer(this.gamerouter);
-        this.gamehttp.listen(gport, () => {
-            logger.info(`Server is running http://localhost:${gport} in ${process.env.NODE_ENV} mode...`);
+        this.gamehttp.listen(gport, gaddr, () => {
+            logger.info(`Server is running http://${gaddr}:${gport} in ${process.env.NODE_ENV} mode...`);
             //this.gameServer = new GameServer(router, this.gamehttp, gport);
             this.gameServer = fn(this.gamerouter, this.gamehttp, gport);
             
             this.monitorhttp = http.createServer(this.monitorrouter);
-            this.monitorhttp.listen(mport, () => {
+            this.monitorhttp.listen(mport, maddr, () => {
                 this.monitorServer = new MonitorServer(this.monitorrouter, this.monitorhttp, mport);
                 this.gameServer.monitor = this.monitorServer;
-                logger.info(`Monitor is running http://localhost:${mport} in ${process.env.NODE_ENV} mode...`);
+                logger.info(`Monitor is running http://${maddr}:${mport} in ${process.env.NODE_ENV} mode...`);
             });
 
         });

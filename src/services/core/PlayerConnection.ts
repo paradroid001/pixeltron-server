@@ -1,6 +1,7 @@
 // const logger = require("../../utils/Logging");
 import logger from '../../utils/Logging';
-import * as socketIO from 'socket.io';
+import * as SocketIO from 'socket.io';
+
 import { NetPlayer } from './NetPlayer';
 import { NetEntity } from './NetEntity';
 import { GameServer } from './GameServer';
@@ -9,7 +10,7 @@ import { GameServerEvent } from './Protocol';
 export class PlayerConnection {
     private _player: NetPlayer;
     private connectionID: number;
-    private socketio: socketIO.Socket;
+    private socketio: SocketIO.Socket;
     private lastPing: number;
     private latency: number;
     private rtt: number;
@@ -107,7 +108,7 @@ export class PlayerConnections {
     // playerdata is database info / saved player info (potentially)
     // THIS FUNCTION RETURNS THE PLAYER, not PLAYERCONNECTION
     // public createPlayer<T extends NetPlayer>(socket: socketIO.Socket, playerdata: any, PlayerClassCreator: new() => T) : T
-    public createPlayerConnection(socket: socketIO.Socket, player: NetPlayer): NetPlayer {
+    public createPlayerConnection(socket: SocketIO.Socket, player: NetPlayer): NetPlayer {
         const pc = new PlayerConnection(this.nextID, socket);
         pc.associate(player);
         this.add(pc);
